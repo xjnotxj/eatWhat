@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>吃啥</title>
+    <meta name="viewport"
+          content="width=device-width,height=device-height,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+</head>
+<link rel="stylesheet" href="css/animate.css">
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+
+    }
+
+    html, body {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        padding: 3%;
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        /*background: url("http://pic.qiantucdn.com/58pic/21/56/60/91j58PICbVs_1024.jpg!/format/webphttp://pic.qiantucdn.com/58pic/21/56/60/91j58PICbVs_1024.jpg!/format/webp");*/
+        background-color: #2D93CA;
+    }
+
+    .eatWhat {
+        text-align: center;
+        height: 15%;
+        width: 100%;
+        position: relative;
+    }
+
+    .eatWhat .btn {
+        font-size: 28px;
+    }
+
+    .container {
+        margin-top: 5%;
+        height: 76%;
+        width: 100%;
+        position: relative;
+        overflow: scroll;
+    }
+
+    .container .media-object {
+        height: 40px;
+    }
+
+</style>
+<body>
+<span class="label label-default" style="margin-left: 2% ;font-size: 12px">已选餐厅</span>&nbsp;
+<a href="#">点餐机会(每天) <span id="food_number" class="badge">0</span>&nbsp;
+</a><a href="#">奶茶机会(每月) <span id="drink_number" class="badge">0</span></a>
+<div class="container">
+    <!--<div class="media">-->
+    <!--<div class="media-left">-->
+    <!--<a href="#">-->
+    <!--<img class="media-object img-thumbnail" src="http://cdn2.mhpbooks.com/2016/02/google.jpg" >-->
+    <!--</a>-->
+    <!--</div>-->
+    <!--<div class="media-body">-->
+    <!--<h4>Media heading</h4>-->
+    <!--</div>-->
+    <!--</div>-->
+
+</div>
+<div class="eatWhat" style="margin-top: 5%">
+    <button type="button" id="eat" class="btn btn-danger"><span class="glyphicon glyphicon-cutlery"
+                                                                aria-hidden="true"></span>
+        今天我要吃点啥
+    </button>
+    <button style="display: none" type="button" id="again" class="btn btn-success"><span
+            class="glyphicon glyphicon-refresh"
+            aria-hidden="true"></span>
+        再来一次
+    </button>
+    <br/>
+    <div style="margin-top: 2%" id="yidiandian">还有每双周随机一次"一点点奶茶"机会哟</div>
+</div>
+</body>
+<script src="//cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+<!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+<link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css"
+      integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<script>
+
+    $(function () {
+
+        var domain = 'http://display.6edigital.com/';
+
+        var food_number;
+        var drink_number;
+        //ajax
+        $.ajax({
+            url: domain+'eatWhat/interface/getApply.php',
+            type: 'GET', //GET
+            async: true,    //或false,是否异步
+            data: {},
+//            dataType:'json',    //返回的数据格式：json/xml/html/script/jsonp/text
+            success: function (data, textStatus, jqXHR) {
+                console.log(data);
+                var data = data.split("|");
+                food_number = data[0];
+                drink_number = data[1];
+                $("#food_number").text(food_number);
+                $("#drink_number").text(drink_number);
+
+                if (food_number == 0) {
+                    $("#eat").addClass("disabled");
+                    $("#eat").attr("disabled", true);
+                }
+
+            },
+            error: function (xhr, textStatus) {
+                console.log('错误');
+            },
+            complete: function () {
+                console.log('结束');
+            }
+        })
+
+        //获取所有成员名单
+        $.get("./name.txt", function (data, textStauts) {
+            console.log("读取名单成功");
+            person_list = data.split("\n");
+
+            for (var i = 0; i < person_list.length; i++) {
+
+                $("div.container").append('<div class="media" id="food_' + (i + 1) + '"><div class="media-left"><a href="#"><img class="media-object img-thumbnail" src="./img/' + person_list[i] + '.png" ></a></div><div class="media-body"><h4>' + person_list[i] + '</h4></div><div>');
+
+            }
+
+        });
+
+//        $.fn.extend({
+//            animateCss: function (animationName) {
+//                var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
+//                this.addClass('animated ' + animationName).one(animationEnd, function () {
+//                    $(this).removeClass('animated ' + animationName);
+//
+//                    $(this).remove();
+//
+//                });
+//            }
+//        });
+
+        $("#eat").click(function () {
+
+            var t = Number($("#food_number").text()) - 1;
+            $("#food_number").text(t);
+
+            $.ajax({
+                url: domain+'eatWhat/interface/applyFood.php',
+                type: 'GET', //GET
+                async: true,    //或false,是否异步
+                data: {},
+//            dataType:'json',    //返回的数据格式：json/xml/html/script/jsonp/text
+                success: function (data, textStatus, jqXHR) {
+
+                },
+                error: function (xhr, textStatus) {
+                    console.log('错误');
+                },
+                complete: function () {
+                    console.log('结束');
+                }
+            });
+
+            $(this).addClass("disabled");
+            $(this).attr("disabled", true);
+
+            var max = person_list.length;
+            var rand = Math.floor(Math.random() * max + 1);
+            console.log("随机数：" + rand);
+
+            var count = 1;
+            var interval = setInterval(function () {
+
+                if (count > max) {
+
+
+                    clearInterval(interval);
+
+                    //抽奶茶
+                    var max2 = 14;
+                    var rand2 = Math.floor(Math.random() * max2 + 1);
+                    console.log("随机数2：" + rand2);
+
+                    if (drink_number != 0 && rand2 == max2) {
+                        $("div.container").append('<div class="media" id="drink"><div class="media-left"><a href="#"><img class="media-object img-thumbnail" src="http://www.yidiandiantea.com/images/logo.png" ></a></div><div class="media-body"><h4>一点点奶茶</h4></div><div>');
+//                        $("#drink").animateCss("lightSpeedIn");
+
+                        var t = Number($("#drink_number").text()) - 1;
+                        $("#drink_number").text(t);
+
+                        $.ajax({
+                            url: domain+'eatWhat/interface/applyDrink.php',
+                            type: 'GET', //GET
+                            async: true,    //或false,是否异步
+                            data: {},
+//            dataType:'json',    //返回的数据格式：json/xml/html/script/jsonp/text
+                            success: function (data, textStatus, jqXHR) {
+
+                            },
+                            error: function (xhr, textStatus) {
+                                console.log('错误');
+                            },
+                            complete: function () {
+                                console.log('结束');
+                            }
+                        });
+
+                    }
+
+                    //改按钮
+                    $("#eat").remove();
+                    $("#yidiandian").remove();
+//                    $("#again").show();
+
+                    $(".label-default").removeClass("label-default").addClass("label-danger").html("今天吃这个");
+
+
+                } else {
+                    if (count != rand) {
+//                        $("#food_" + count).animateCss("bounceOutRight");
+                        $("#food_" + count).remove();
+                    }
+                }
+
+                count++;
+
+            }, 0);
+
+
+        });
+
+        $("#again").click(function () {
+
+            location.reload();
+
+        });
+
+    });
+
+</script>
+</html>
